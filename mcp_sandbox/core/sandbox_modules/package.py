@@ -91,7 +91,7 @@ class SandboxPackageMixin:
         try:
             import time
             start_time = time.time()
-            max_wait = 5
+            max_wait = 30
             while time.time() - start_time < max_wait:
                 if status_key in self.package_install_status:
                     status = self.package_install_status[status_key]
