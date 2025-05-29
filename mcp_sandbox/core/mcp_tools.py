@@ -124,7 +124,7 @@ class SandboxToolsPlugin:
 
         @self.mcp.tool(
             name="upload_file_to_sandbox",
-            description="Uploads a file from your local computer to the specified sandbox, supporting full file paths including drive letters and multi-level directories. Parameters: sandbox_id (string) - The ID of the target sandbox, local_file_path (string) - The full path of the file on your local computer to be uploaded, dest_path (string, optional, default: /app/results) - The target directory path within the sandbox where the file will be stored."
+            description="Uploads a file from your local computer to the specified sandbox. Parameters: sandbox_id (string), local_file_path (string) - The full path of the file on your local computer to be uploaded, dest_path (string, optional, default: /app/results) - The target folder path in the sandbox, the uploaded file will be saved here with its original name."
         )
         def upload_file_to_sandbox(sandbox_id: str, local_file_path: str, dest_path: str = "/app/results") -> dict:
             # Validate sandbox access
