@@ -44,7 +44,8 @@ class SandboxFileOpsMixin:
         from mcp_sandbox.db.database import db
         
         base_url = getattr(config, "BASE_URL", None) or "http://localhost:8000"
-        
+
+        api_key = None
         sandbox = db.get_sandbox(sandbox_id)
         if sandbox and sandbox.get("user_id"):
             user_id = sandbox.get("user_id")
