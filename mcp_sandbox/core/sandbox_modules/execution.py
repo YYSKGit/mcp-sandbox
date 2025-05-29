@@ -7,7 +7,6 @@ class SandboxExecutionMixin:
         error = self.verify_sandbox_exists(sandbox_id)
         if error:
             return error
-        start_ts = int(time.time())
         logger = self._get_logger()
         logger.info("Executing code:")
         logger.info("=" * 50)
@@ -33,6 +32,7 @@ class SandboxExecutionMixin:
                         "files": [],
                         "file_links": []
                     }
+                files_before = set(self.list_files_in_sandbox(sandbox_id, with_stat=False))
                 exec_result = sandbox.exec_run(
                     cmd=["python", temp_code_file],
                     workdir="/app/results",
@@ -46,8 +46,8 @@ class SandboxExecutionMixin:
                 stdout = stdout_bytes.decode('utf-8') if stdout_bytes else ""
                 stderr = stderr_bytes.decode('utf-8') if stderr_bytes else ""
                 sandbox.exec_run(cmd=["rm", "-f", temp_code_file], privileged=False)
-                all_files = self.list_files_in_sandbox(sandbox_id, with_stat=True)
-                new_files = [f for f, ctime in all_files if ctime >= start_ts]
+                files_after = set(self.list_files_in_sandbox(sandbox_id, with_stat=False))
+                new_files = list(files_after - files_before)
                 file_links = [self.get_file_link(sandbox_id, f) for f in new_files]
                 logger.info("Execution results:")
                 logger.info(f"Exit code: {exit_code}")
