@@ -317,6 +317,50 @@ class SandboxManager:
             
             return {"success": False, "message": error_msg, "error": str(e)}
 
+    def delete_sandbox_by_id(self, sandbox_id: str) -> Dict[str, Any]:
+        """
+        删除指定的沙盒（包括 Docker 容器和数据库记录）。
+
+        Args:
+            sandbox_id: 要删除的沙盒的数据库 ID。
+
+        Returns:
+            一个包含操作结果的字典。
+        """
+        # 1. 从数据库获取沙盒记录
+        sandbox_record = db.get_sandbox(sandbox_id)
+        if not sandbox_record:
+            logger.warning(f"尝试删除沙盒失败：未找到沙盒 {sandbox_id}")
+            return {"success": False, "message": f"未找到沙盒 {sandbox_id}"}
+
+        docker_container_id = sandbox_record.get("docker_container_id")
+        docker_deleted = False
+        docker_message = "没有关联的 Docker 容器。"
+
+        # 2. 如果存在，删除 Docker 容器
+        if docker_container_id:
+            logger.info(f"正在为沙盒 {sandbox_id} 删除 Docker 容器 {docker_container_id}...")
+            # 使用现有的 delete_sandbox 删除 Docker 容器
+            result = self.delete_sandbox(docker_container_id)
+            docker_deleted = result.get("success", False)
+            docker_message = result.get("message", "删除 Docker 容器时发生错误。")
+            if not docker_deleted:
+                logger.error(f"删除 Docker 容器 {docker_container_id} 失败: {docker_message}")
+
+        # 3. 从数据库删除沙盒记录
+        logger.info(f"正在从数据库删除沙盒 {sandbox_id}...")
+        db_deleted = db.delete_sandbox(sandbox_id)
+
+        if db_deleted:
+            logger.info(f"成功从数据库删除沙盒 {sandbox_id}。")
+            if docker_container_id and not docker_deleted:
+                return {"success": True, "message": f"沙盒 {sandbox_id} 的数据库记录已删除，但 Docker 容器删除失败: {docker_message}"}
+            else:
+                return {"success": True, "message": f"沙盒 {sandbox_id} 已成功删除。"}
+        else:
+            logger.error(f"从数据库删除沙盒 {sandbox_id} 失败。")
+            return {"success": False, "message": f"从数据库删除沙盒 {sandbox_id} 失败。"}
+    
     @contextmanager
     def _get_running_sandbox(self, sandbox_id: str):
         """Get running container by sandbox_id"""
