@@ -3,6 +3,7 @@ from fastapi.responses import StreamingResponse
 from mcp_sandbox.core.sandbox_modules.manager import SandboxManager
 from mcp_sandbox.core.sandbox_modules.file_ops import SandboxFileOpsMixin
 from mcp_sandbox.utils.config import logger
+from urllib.parse import quote
 import io
 import os
 import tarfile
