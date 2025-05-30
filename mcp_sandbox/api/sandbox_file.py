@@ -50,7 +50,8 @@ def get_sandbox_file(
                 raise HTTPException(status_code=404, detail="File not found in sandbox")
             mime_type, _ = mimetypes.guess_type(member.name)
             mime_type = mime_type or "application/octet-stream"
-            headers = {"Content-Disposition": f"inline; filename={member.name}"}
+            filename_encoded = quote(member.name)
+            headers = {"Content-Disposition": f"inline; filename*=UTF-8''{filename_encoded}"}
             return StreamingResponse(fileobj, media_type=mime_type, headers=headers)
     except Exception as e:
         logger.error(f"Failed to fetch file from sandbox {sandbox_id}: {e}")
