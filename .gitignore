@@ -451,7 +451,7 @@ pyrightconfig.json
 # End of https://www.toptal.com/developers/gitignore/api/pycharm,visualstudiocode,node,python
 
 /.docker_build_info
-/mcp_logo.png
+/mcp_logo.ico
 /update.ps1
 /start.ps1
 desktop.ini
